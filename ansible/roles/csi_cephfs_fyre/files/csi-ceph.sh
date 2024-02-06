@@ -17,7 +17,7 @@ fi
 rm -rf rook
 echo "Doing clone of rook release $rookRelease"
 git clone https://github.com/rook/rook.git
-if [[ $rookRelease != "master" ]]; then 
+if [[ $rookRelease != "master" ]]; then
   cd rook
   rook_branch_version=$(echo $rookRelease | cut -f1 -d'-' | cut -f3 -d'.' --complement | sed 's/v//g')
   echo "For tag $rookRelease we are using branch release-$rook_branch_version"
@@ -27,16 +27,10 @@ fi
 # if rook-ceph is version 1.5, then need to create/apply crd
 majorRelease=$(echo ${rookRelease:0:4})
 
-rookPath="rook/cluster/examples/kubernetes/ceph"
-[[ $(cut -d '.' -f2 <<< $majorRelease) -ge 8 ]] && rookPath=rook/deploy/examples || true
-if [[ $majorRelease != "v1.4" ]]
-then
-  echo "Doing crds.yaml"
-  oc create -f $rookPath/crds.yaml
-  echo "crds.yaml exit $?"
-else
-  echo "No reason to apply crds.yaml as file may not exist"
-fi
+rookPath=rook/deploy/examples
+echo "Doing crds.yaml"
+oc create -f $rookPath/crds.yaml
+echo "crds.yaml exit $?"
 echo "Doing common.yaml"
 oc create -f $rookPath/common.yaml
 echo "common.yaml exit $?"
@@ -44,7 +38,7 @@ echo "common.yaml exit $?"
 echo "Setting up Docker registry image pull secrets"
 if [[ -z $registry ]]; then
   echo "Using unauthenticated Docker registry pulls. Skipping ServiceAccount patching"
-else 
+else
   echo "Creating image pull secret for $registry and patching rook-ceph ServiceAccounts"
   oc project rook-ceph
   oc create secret docker-registry dockerhub-secret --docker-server=$registry --docker-username=$registry_user --docker-password=$registry_pwd --docker-email=unused
@@ -72,14 +66,15 @@ while [[ $sleep_count -gt 0 ]]; do
   fi
 done
 echo "Doing sed of useAllDevices false"
-sed -i 's/useAllDevices: true/useAllDevices: false/g' $rookPath/cluster.yaml
+sed -i 's/useAllDevices: true/useAllDevices: false/g' $rookPath/cluster-test.yaml
 echo "Exit from useAllDevice $?"
 echo "Doing sed of deviceFilter"
-sed -i 's/#deviceFilter:/deviceFilter: ^vd[b-z]$/g' $rookPath/cluster.yaml
+sed -i 's/#deviceFilter:/deviceFilter: ^vd[b-z]$/g' $rookPath/cluster-test.yaml
 echo "Exit from deviceFilter $?"
+sed -i 's/name: my-cluster/name: rook-cluster/g' $rookPath/cluster-test.yaml
 echo "Doing cluster.yaml create"
-oc create -f $rookPath/cluster.yaml
-echo "Exit from cluster.yaml $?"
+oc create -f $rookPath/cluster-test.yaml
+echo "Exit from cluster-test.yaml $?"
 
 num_worker_nodes=$(oc get no | tr -s ' ' | cut -f3 -d' ' | grep worker  | wc -l)
 echo "Check for the number of ceph nodes running is equal to numbers of worker nodes - wait up to 2 hour"
@@ -100,16 +95,6 @@ echo "Doing filessystem-test.yaml"
 oc create -f $rookPath/filesystem-test.yaml
 echo "Exit from filesystem-test.yaml $?"
 oc create -f $rookPath/csi/cephfs/storageclass.yaml
-sed -i "s/rook-cephfs/csi-cephfs/g" $rookPath/csi/cephfs/storageclass.yaml
-oc create -f $rookPath/csi/cephfs/storageclass.yaml
-default_storage_class=$(oc get sc  | grep -e default | cut -f1 -d' ' | tr -s ' ')
-echo "default_storage_class is $default_storage_class"
-if [[ -z $default_storage_class ]]; then
-  echo "No default storage class defined"
-else
-  echo "Set storageclass $default_storage_class to not be default"
-  oc patch storageclass $default_storage_class -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-fi
-echo "Set default storageclass to $new_default_sc"
-oc patch storageclass $new_default_sc -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+echo "Set default storageclass to rook-cephfs"
+oc patch storageclass rook-cephfs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 oc create -f $rookPath/csi/rbd/storageclass-test.yaml

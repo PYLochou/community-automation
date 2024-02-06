@@ -55,7 +55,7 @@
         msg: "{{ waitceph.stdout_lines }}"
 
     - name: "Wait until oc get cephclusters is ready"
-      shell: "oc get cephclusters.ceph.rook.io rook-ceph -n rook-ceph -o jsonpath='{.status.phase}'"
+      shell: "oc get cephclusters.ceph.rook.io rook-cluster -n rook-ceph -o jsonpath='{.status.phase}'"
       register: cephclusters
       until: cephclusters.stdout.find('Ready') != -1
       changed_when: false

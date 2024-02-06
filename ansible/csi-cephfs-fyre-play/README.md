@@ -3,12 +3,11 @@
 ## Overview
 
 - Installs rook-cephfs from repository https://github.com/rook/rook.git onto your fyre inf node.
-- Default rook-ceph release is `v1.5.9`.  See release information here https://github.com/rook/rook/releases. The use of `master` is also supported.
-- Creates 3 storageClass
+- Default rook-ceph release is `v1.13.3`.  See release information here https://github.com/rook/rook/releases. The use of `master` is also supported.
+- Creates 2 storageClass
   - rook-cephfs - File store (RWX)
   - rook-ceph-block - Ceph Block storage (RWO)
-  - csi-cephfs - For backward compatability to earlier versions of rook-ceph. This is the same storageclass as rook-cephfs.
-- Sets csi-cephfs as the default storageclass.
+- Sets rook-cephfs as the default storageclass.
 
 ## Assumptions:
 
@@ -24,7 +23,7 @@
 ## Setting up inventory
 
 - From the `csi-cephfs-fyre-play` directory copy the sample inventory file at `examples/inventory` to the  current directory.
-- Modify `fyre.inf.node.9dot.ip` variable in the `inventory` file with the 9dot ip of the inf node in your fyre OCP+Beta cluster.
+- Modify `fyre.inf.node.9dot.ip` variable in the `inventory` file with the 9dot IP or the FQDN of the inf node in your fyre OCP+ cluster.
 - Modify `fyre.root.pw` variable in the `inventory` file  with your fyre root password.
 
 ```
@@ -33,40 +32,43 @@ cp examples/inventory .
 
 ## Run playbook
 
-
 Once you have configured the `inventory` file, run the playbook using:
 
 ```
-ansible-playbook  -i inventory csi-cephfs.yml
+ansible-playbook -i inventory csi-cephfs.yml
 ```
 or to pass a new rook-ceph release
 
 ```
-ansible-playbook  -i inventory csi-cephfs.yml --extra-vars "rook_cephfs_release=v1.5.9"
+ansible-playbook -i inventory csi-cephfs.yml --extra-vars "rook_cephfs_release=v1.13.3"
 ```
+
 or to get the master release
 
 ```
-ansible-playbook  -i inventory csi-cephfs.yml --extra-vars "rook_cephfs_release=master"
+ansible-playbook -i inventory csi-cephfs.yml --extra-vars "rook_cephfs_release=master"
 ```
 or set new default storageclass to something other than csi-cephfs
 
 ```
-ansible-playbook  -i inventory csi-cephfs.yml --extra-vars "default_sc=rook-cephfs"
+ansible-playbook -i inventory csi-cephfs.yml --extra-vars "default_sc=rook-cephfs"
 ```
 
-or pass Docker registry authentication. Note that the `registry` variable must be specified in order for the playbook to setup the 
+or pass Docker registry authentication. Note that the `registry` variable must be specified in order for the playbook to setup the
 ImagePullSecret.
 ```
-ansible-playbook  -i inventory csi-cephfs.yml --extra-vars "registry=docker.io registry_user=MYUSER registry_pwd=MYPASSWORD"
+ansible-playbook -i inventory csi-cephfs.yml --extra-vars "registry=docker.io registry_user=MYUSER registry_pwd=MYPASSWORD"
 ```
-Additionally if you have special characters in your variables (as is common with passwords) consider using a JSON or YAML file and 
+Additionally if you have special characters in your variables (as is common with passwords) consider using a JSON or YAML file and
 referencing it as below
+
 ```
-ansible-playbook  -i inventory csi-cephfs.yml --extra-vars "@registry.json"
+ansible-playbook -i inventory csi-cephfs.yml --extra-vars "@registry.json"
 ```
+
 `registry.json`:
-```
+
+```json
 {
   "registry": "docker.io",
   "registry_user": "MYUSER",
