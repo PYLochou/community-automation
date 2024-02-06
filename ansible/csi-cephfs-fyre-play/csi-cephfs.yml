@@ -1,13 +1,7 @@
 ---
 - name: Install csi-cephfs on Fyre OCP+ env
   hosts: bastion
-  gather_facts: false
   tasks:
-    - name: Include role python_install_fyre
-      ansible.builtin.include_role:
-        name: python_install_fyre
-    - name: Gathering Facts
-      ansible.builtin.setup:
     - name: Include role git_install_fyre
       ansible.builtin.include_role:
         name: git_install_fyre

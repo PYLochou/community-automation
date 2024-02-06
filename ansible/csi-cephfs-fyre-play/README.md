@@ -18,7 +18,7 @@
    - `GUI CLUSTERS:` By default using the OCP+ GUI (fyre.ibm.com) to create your cluster you will get a 200G /dev/vdb additional disk on each worker.
    - `API CLUSTERS:`If using the OCP+ API to create your cluster be sure to have additional disks specified for your workers.
      - "additional_disk": [ "200" ]
-
+ - python3 package is already installed on the inf node of your OCP+ cluster.
 
 ## Setting up inventory
 
