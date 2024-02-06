@@ -2,10 +2,5 @@
 # tasks git install
 
 - name: Install git on fyre inf node
-  yum:
+  ansible.builtin.yum:
     name: git
-  register: gitinstall
-
-- name: Viewing git-install log
-  debug:
-    msg: "{{ gitinstall.stdout_lines }}"
