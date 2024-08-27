@@ -41,7 +41,7 @@ ansible-playbook -i inventory csi-cephfs.yml
 or to pass a new rook-ceph release
 
 ```shell
-ansible-playbook -i inventory csi-cephfs.yml --extra-vars "rook_cephfs_release=v1.14.8"
+ansible-playbook -i inventory csi-cephfs.yml --extra-vars "rook_cephfs_release=v1.14.10"
 ```
 
 > [!NOTE]

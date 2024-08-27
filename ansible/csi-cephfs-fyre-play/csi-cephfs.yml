@@ -2,6 +2,9 @@
 - name: Install csi-cephfs on Fyre OCP+ env
   hosts: bastion
   tasks:
+    - name: Include role git_install_fyre
+      ansible.builtin.include_role:
+        name: git_install_fyre
     - name: Include role csi_cephfs_fyre
       ansible.builtin.include_role:
         name: csi_cephfs_fyre
