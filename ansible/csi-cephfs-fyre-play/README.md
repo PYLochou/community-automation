@@ -2,8 +2,8 @@
 
 ## Overview
 
-- Installs rook-cephfs from repository https://github.com/rook/rook.git onto your fyre inf node.
-- Default rook-ceph release is `v1.13.3`.  See release information here https://github.com/rook/rook/releases. The use of `master` is also supported.
+- Installs rook-cephfs from repository `https://github.com/rook/rook.git` onto your fyre inf node.
+- Default rook-ceph release is `v1.13.3`.  See release information here <https://github.com/rook/rook/releases>. The use of `master` is also supported.
 - Creates 2 storageClass
   - rook-cephfs - File store (RWX)
   - rook-ceph-block - Ceph Block storage (RWO)
