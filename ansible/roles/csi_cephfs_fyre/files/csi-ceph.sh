@@ -33,7 +33,10 @@ oc create -f $rookPath/crds.yaml
 echo "crds.yaml exit $?"
 echo "Doing common.yaml"
 oc create -f $rookPath/common.yaml
-echo "common.yaml exit $?"
+echo "common.yaml exit $?
+echo "Doing csi-operator.yaml"
+oc create -f $rookPath/csi-operator.yaml
+echo "csi-operator.yaml exit $?"
 
 echo "Setting up Docker registry image pull secrets"
 if [[ -z $registry ]]; then
